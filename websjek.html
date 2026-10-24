@@ -1,0 +1,4701 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080914">
+
+<title>Dzakiyy Prawira | CyberPunk</title>
+
+<style>
+  
+/* =====================================
+   CYBER STRIKE ARCADE
+===================================== */
+
+.cs-shell {
+    --cs-cyan: #00f5ff;
+    --cs-pink: #ff36d1;
+    --cs-purple: #a855f7;
+
+    padding: 18px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 0 35px rgba(0,245,255,.08);
+    overflow: hidden;
+}
+
+.cs-topbar,
+.cs-topbar > div,
+.cs-health-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.cs-topbar {
+    flex-wrap: wrap;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 18px;
+}
+
+.cs-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3cff9d;
+    box-shadow: 0 0 12px #3cff9d;
+}
+
+#csStatus {
+    color: var(--primary);
+}
+
+.cs-hud {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+    margin-bottom: 20px;
+}
+
+.cs-stat {
+    min-width: 0;
+    padding: 12px 8px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+}
+
+.cs-stat small,
+.cs-stat strong {
+    display: block;
+    overflow-wrap: anywhere;
+}
+
+.cs-stat small {
+    font-size: 9px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.cs-stat strong {
+    color: var(--primary);
+    font-size: clamp(13px, 3vw, 21px);
+    font-variant-numeric: tabular-nums;
+}
+
+.cs-health {
+    margin-bottom: 17px;
+}
+
+.cs-health-label {
+    font-size: 10px;
+    color: var(--muted);
+    margin: 12px 0 7px;
+}
+
+.cs-health-label strong {
+    color: var(--text);
+}
+
+.cs-track {
+    height: 8px;
+    border-radius: 10px;
+    background: var(--panel2);
+    overflow: hidden;
+}
+
+.cs-hp-fill,
+.cs-shield-fill {
+    width: 100%;
+    height: 100%;
+    transition: width .2s ease;
+}
+
+.cs-hp-fill {
+    background: linear-gradient(90deg, #ff315d, #ff8b70);
+    box-shadow: 0 0 12px #ff315d;
+}
+
+.cs-shield-fill {
+    background: linear-gradient(90deg, #00bfff, #00f5ff);
+    box-shadow: 0 0 12px #00f5ff;
+}
+
+.cs-arena {
+    position: relative;
+    width: 100%;
+    height: clamp(340px, 62vw, 520px);
+    overflow: hidden;
+    border: 1px solid rgba(0,245,255,.55);
+    border-radius: 12px;
+    background: #050713;
+    isolation: isolate;
+    touch-action: none;
+}
+
+#csCanvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.cs-arena::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 4px,
+        rgba(0,245,255,.035) 5px
+    );
+}
+
+.cs-arena-label {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    z-index: 2;
+    color: rgba(0,245,255,.65);
+    font-size: 9px;
+    letter-spacing: 2px;
+    pointer-events: none;
+}
+
+.cs-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(3,5,17,.78);
+    backdrop-filter: blur(5px);
+}
+
+.cs-overlay.hidden {
+    display: none !important;
+}
+
+.cs-overlay-box {
+    width: min(360px, 100%);
+    padding: 25px 18px;
+    text-align: center;
+    border: 1px solid rgba(0,245,255,.55);
+    border-radius: 15px;
+    background: rgba(12,16,37,.94);
+    box-shadow: 0 0 30px rgba(0,245,255,.13);
+}
+
+.cs-mini-logo {
+    color: var(--cs-cyan);
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-bottom: 17px;
+}
+
+.cs-overlay-box h3 {
+    font-size: clamp(25px, 6vw, 38px);
+    color: var(--cs-cyan);
+    text-shadow: 0 0 15px rgba(0,245,255,.6);
+    margin-bottom: 12px;
+}
+
+.cs-overlay-box p {
+    color: #b4bfdc;
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 22px;
+}
+
+.cs-button {
+    padding: 12px 15px;
+    color: var(--cs-cyan);
+    background: rgba(0,245,255,.08);
+    border: 1px solid var(--cs-cyan);
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: .5px;
+    transition: .2s;
+}
+
+.cs-button:hover:not(:disabled) {
+    color: #071018;
+    background: var(--cs-cyan);
+    box-shadow: 0 0 20px rgba(0,245,255,.45);
+}
+
+.cs-button:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+.cs-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 15px 0 25px;
+}
+
+.cs-controls .cs-button {
+    flex: 1;
+    min-width: 95px;
+}
+
+.cs-button.cs-special {
+    color: #ff76e7;
+    border-color: #ff36d1;
+    background: rgba(255,54,209,.07);
+}
+
+.cs-button.cs-special:hover:not(:disabled) {
+    color: #180719;
+    background: #ff36d1;
+}
+
+.cs-loadout h3,
+.cs-guide h3 {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.cs-loadout > p {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+    margin-bottom: 14px;
+}
+
+.cs-weapons {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.cs-weapon {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    padding: 13px 10px;
+    color: var(--text);
+    text-align: left;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    transition: .2s;
+}
+
+.cs-weapon > span {
+    font-size: 23px;
+}
+
+.cs-weapon strong {
+    font-size: 10px;
+    overflow-wrap: anywhere;
+}
+
+.cs-weapon small {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.cs-weapon.selected {
+    border-color: var(--primary);
+    box-shadow: inset 0 0 15px rgba(0,245,255,.07),
+                0 0 12px rgba(0,245,255,.12);
+}
+
+.cs-guide {
+    margin-top: 23px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+}
+
+.cs-guide h3 {
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.cs-guide p {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.8;
+    margin: 9px 0;
+}
+
+.cs-guide b {
+    color: var(--text);
+}
+
+.cs-arena-toast {
+    position: absolute;
+    top: 45px;
+    left: 50%;
+    z-index: 4;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 90%;
+    padding: 9px 13px;
+    border: 1px solid var(--cs-cyan);
+    border-radius: 8px;
+    color: var(--cs-cyan);
+    background: rgba(4,8,25,.92);
+    font-size: 11px;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+}
+
+.cs-arena-toast.show {
+    opacity: 1;
+}
+
+@media (max-width: 500px) {
+    .cs-shell {
+        padding: 11px;
+    }
+
+    .cs-hud {
+        gap: 6px;
+    }
+
+    .cs-stat {
+        padding: 10px 6px;
+    }
+
+    .cs-stat small {
+        font-size: 8px;
+        letter-spacing: .3px;
+    }
+
+    .cs-weapons {
+        grid-template-columns: 1fr;
+    }
+
+    .cs-weapon {
+        display: grid;
+        grid-template-columns: 35px 1fr;
+        column-gap: 9px;
+    }
+
+    .cs-weapon > span {
+        grid-row: span 2;
+    }
+
+    .cs-weapon strong,
+    .cs-weapon small {
+        grid-column: 2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cs-shell *,
+    .cs-shell *::before,
+    .cs-shell *::after {
+        transition-duration: .01ms !important;
+    }
+}
+
+#loginScreen .login-card {
+    text-align: center;
+}
+
+#loginScreen .login-card .login-icon {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+  .login-icon {
+    width: 150px;
+    height: 150px;
+    margin: 25px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #00f5ff;
+    box-shadow:
+        0 0 15px #00f5ff,
+        0 0 30px rgba(0, 245, 255, 0.4);
+}
+/* Efek Cyber Neon pada Foto Profil */
+.about-photo {
+    width: 200px;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+
+    /* Cahaya neon di tepi foto */
+    border: 2px solid #00f7ff;
+    box-shadow:
+        0 0 5px #00f7ff,
+        0 0 12px #00eaff,
+        0 0 25px rgba(0, 247, 255, 0.8),
+        0 0 45px rgba(0, 100, 255, 0.5);
+
+    /* Animasi cahaya */
+    animation: cyberGlow 2s ease-in-out infinite alternate;
+}
+
+/* Animasi neon berdenyut */
+@keyframes cyberGlow {
+    from {
+        box-shadow:
+            0 0 5px #00f7ff,
+            0 0 12px #00eaff,
+            0 0 20px rgba(0, 247, 255, 0.6);
+        border-color: #00f7ff;
+    }
+
+    to {
+        box-shadow:
+            0 0 10px #00f7ff,
+            0 0 25px #00eaff,
+            0 0 40px rgba(0, 100, 255, 0.9);
+        border-color: #168bff;
+    }
+}
+
+/* Tombol lihat proyek */
+.project-btn {
+    display: inline-block;
+    margin-top: 22px;
+    padding: 12px 20px;
+
+    color: #00f7ff;
+    background: rgba(0, 247, 255, 0.08);
+    border: 1px solid #00f7ff;
+    border-radius: 10px;
+
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+
+    box-shadow: 0 0 10px rgba(0, 247, 255, 0.25);
+    transition: 0.3s ease;
+}
+
+/* Efek saat tombol ditekan atau diarahkan */
+.project-btn:hover {
+    color: #080b18;
+    background: #00f7ff;
+    box-shadow:
+        0 0 10px #00f7ff,
+        0 0 25px rgba(0, 247, 255, 0.8);
+
+    transform: translateY(-3px);
+}
+
+  
+/* Foto About JekPraw berada di tengah */
+.about-photo {
+    display: block;
+    width: 350px;
+    max-width: 100%;
+    height: auto;
+
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 15px;
+
+    box-sizing: border-box;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+  
+/* Efek Cyber Neon pada Foto Profil */
+.profile-photo {
+    width: 200px;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+
+    /* Cahaya neon di tepi foto */
+    border: 2px solid #00f7ff;
+    box-shadow:
+        0 0 5px #00f7ff,
+        0 0 12px #00eaff,
+        0 0 25px rgba(0, 247, 255, 0.8),
+        0 0 45px rgba(0, 100, 255, 0.5);
+
+    /* Animasi cahaya */
+    animation: cyberGlow 2s ease-in-out infinite alternate;
+}
+
+/* Animasi neon berdenyut */
+@keyframes cyberGlow {
+    from {
+        box-shadow:
+            0 0 5px #00f7ff,
+            0 0 12px #00eaff,
+            0 0 20px rgba(0, 247, 255, 0.6);
+        border-color: #00f7ff;
+    }
+
+    to {
+        box-shadow:
+            0 0 10px #00f7ff,
+            0 0 25px #00eaff,
+            0 0 40px rgba(0, 100, 255, 0.9);
+        border-color: #168bff;
+    }
+}
+
+
+/* =====================================
+   1. VARIABLE TEMA
+===================================== */
+
+:root {
+    --bg: #080914;
+    --panel: #111426;
+    --panel2: #191d33;
+    --text: #f5f7ff;
+    --muted: #9ba5c6;
+    --primary: #00f5ff;
+    --secondary: #a855f7;
+    --accent: #ff4fd8;
+    --border: rgba(0,245,255,.25);
+    --shadow: 0 0 25px rgba(0,245,255,.12);
+}
+
+body.modern {
+    --bg: #f3f5fc;
+    --panel: #ffffff;
+    --panel2: #e9edfa;
+    --text: #202640;
+    --muted: #69718b;
+    --primary: #5268ed;
+    --secondary: #9462e8;
+    --accent: #e866a4;
+    --border: rgba(82,104,237,.2);
+    --shadow: 0 8px 30px rgba(35,45,90,.08);
+}
+
+/* =====================================
+   2. RESET
+===================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background .3s, color .3s;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.container {
+    width: min(1100px, 92%);
+    margin: auto;
+}
+
+/* =====================================
+   3. BACKGROUND
+===================================== */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 10% 15%,
+            rgba(0,245,255,.10),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 90% 80%,
+            rgba(168,85,247,.12),
+            transparent 35%
+        );
+}
+
+#particles {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* =====================================
+   4. TOMBOL
+===================================== */
+
+.btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    padding: 12px 18px;
+
+    background: var(--panel2);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    transition: .25s;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary);
+    box-shadow: var(--shadow);
+}
+
+.btn.primary {
+    background: var(--primary);
+    color: #071018;
+    font-weight: bold;
+}
+
+body.modern .btn.primary {
+    color: white;
+}
+
+.btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* =====================================
+   5. LOGIN
+===================================== */
+
+#loginScreen {
+    min-height: 100vh;
+
+    display: grid;
+    place-items: center;
+
+    padding: 25px;
+}
+
+.login-card {
+    width: min(430px, 100%);
+    padding: 35px 28px;
+
+    text-align: center;
+
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 23px;
+
+    box-shadow: var(--shadow);
+
+    animation: appear .7s ease;
+}
+
+.logo {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 5px;
+    color: var(--primary);
+}
+
+.login-icon {
+    font-size: 65px;
+    margin: 25px 0;
+}
+
+.login-card h1 {
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+.login-card p {
+    color: var(--muted);
+    line-height: 1.8;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 14px;
+
+    margin: 25px 0 15px;
+
+    background: var(--bg);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.login-card .btn {
+    width: 100%;
+}
+
+.login-note {
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-top: 20px;
+}
+
+/* =====================================
+   6. HEADER
+===================================== */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar {
+    width: min(1150px, 94%);
+    min-height: 70px;
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.brand {
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 2px;
+}
+
+.brand span {
+    color: var(--primary);
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-btn {
+    padding: 9px 12px;
+
+    background: var(--panel);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+}
+
+nav {
+    display: flex;
+    gap: 6px;
+
+    overflow-x: auto;
+    padding: 10px 3% 13px;
+}
+
+nav button {
+    white-space: nowrap;
+
+    padding: 10px 13px;
+
+    background: transparent;
+    color: var(--muted);
+
+    border: 1px solid transparent;
+    border-radius: 9px;
+}
+
+nav button:hover,
+nav button.active {
+    color: var(--primary);
+    background: var(--panel);
+    border-color: var(--border);
+}
+
+/* =====================================
+   7. HALAMAN
+===================================== */
+
+.page {
+    display: none;
+    padding: 35px 0 70px;
+    animation: appear .4s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+.section-label {
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    margin-bottom: 15px;
+}
+
+h1,
+h2,
+h3 {
+    line-height: 1.4;
+}
+
+h2 {
+    font-size: clamp(27px, 5vw, 38px);
+    margin-bottom: 15px;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.section-heading {
+    margin-bottom: 28px;
+}
+
+.section-heading p {
+    color: var(--muted);
+    line-height: 1.8;
+}
+
+/* =====================================
+   8. HERO
+===================================== */
+
+.hero {
+    min-height: 430px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+
+    padding: clamp(25px, 6vw, 65px);
+
+    background: linear-gradient(
+        120deg,
+        var(--panel),
+        transparent
+    );
+
+    border: 1px solid var(--border);
+    border-radius: 25px;
+
+    overflow: hidden;
+    position: relative;
+}
+
+.hero-content {
+    max-width: 650px;
+    position: relative;
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: clamp(35px, 7vw, 65px);
+    margin-bottom: 20px;
+}
+
+.hero p {
+    color: var(--muted);
+    line-height: 1.9;
+    margin-bottom: 25px;
+}
+
+.highlight {
+    color: var(--primary);
+}
+
+.typing {
+    color: var(--secondary);
+    min-height: 30px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.profile-orb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+    display: block;
+}
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 9px 13px;
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 22px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+    background: #3cff9d;
+
+    box-shadow: 0 0 10px #3cff9d;
+}
+
+/* =====================================
+   9. GRID DAN KARTU
+===================================== */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 17px;
+}
+
+.card {
+    padding: 23px;
+
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 17px;
+
+    transition: .25s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+
+.card-icon {
+    font-size: 34px;
+    margin-bottom: 17px;
+}
+
+.card h3 {
+    margin-bottom: 10px;
+}
+
+.card p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.9;
+    margin-bottom: 15px;
+}
+
+/* =====================================
+   10. STATISTIK
+===================================== */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+
+    margin: 22px 0 40px;
+}
+
+.stat {
+    padding: 23px;
+
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+}
+
+.stat strong {
+    display: block;
+    color: var(--primary);
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+.stat span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* =====================================
+   11. SKILLS
+===================================== */
+
+.skill {
+    margin-bottom: 25px;
+}
+
+.skill-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.skill-info span:last-child {
+    color: var(--primary);
+}
+
+.progress {
+    height: 9px;
+
+    overflow: hidden;
+
+    background: var(--panel2);
+    border-radius: 10px;
+}
+
+.progress-bar {
+    width: 0;
+    height: 100%;
+
+    background: linear-gradient(
+        90deg,
+        var(--primary),
+        var(--secondary)
+    );
+
+    border-radius: 10px;
+    transition: width 1.2s ease;
+}
+
+/* =====================================
+   12. PROYEK
+===================================== */
+
+.project-top {
+    font-size: 35px;
+    margin-bottom: 18px;
+}
+
+.tag {
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    color: var(--primary);
+    background: var(--panel2);
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    font-size: 11px;
+    margin: 3px 3px 10px 0;
+}
+
+/* =====================================
+   13. EDITOR PROFIL
+===================================== */
+
+.form-box {
+    max-width: 800px;
+    padding: 25px;
+
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+}
+
+.form-box label {
+    display: block;
+    margin: 18px 0 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.form-box input,
+.form-box textarea {
+    width: 100%;
+    padding: 14px;
+
+    color: var(--text);
+    background: var(--bg);
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.form-box textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.8;
+}
+
+/* =====================================
+   14. GOALS
+===================================== */
+
+.goal-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+
+    padding: 18px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.goal-item input {
+    margin-top: 6px;
+    accent-color: var(--primary);
+}
+
+.goal-item p {
+    color: var(--muted);
+    line-height: 1.7;
+    margin-top: 5px;
+}
+
+.goal-item.done strong {
+    text-decoration: line-through;
+    opacity: .6;
+}
+
+/* =====================================
+   15. TOAST
+===================================== */
+
+#toast {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+
+    transform: translate(-50%, 30px);
+
+    width: max-content;
+    max-width: 90%;
+
+    padding: 14px 20px;
+
+    background: var(--panel2);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: .3s;
+    z-index: 100;
+}
+
+#toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* =====================================
+   16. FOOTER
+===================================== */
+
+footer {
+    padding: 30px 15px;
+    text-align: center;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 2;
+}
+
+/* =====================================
+   17. ANIMASI
+===================================== */
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-13px);
+    }
+}
+
+/* =====================================
+   18. RESPONSIVE
+===================================== */
+
+@media (max-width: 800px) {
+
+    .hero {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+    }
+
+.profile-orb {
+    width: 180px;
+    height: 180px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary);
+    box-shadow: 0 0 25px rgba(0, 245, 255, 0.25);
+    animation: float 4s ease-in-out infinite;
+}
+
+.profile-orb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border-radius: 50%;
+}
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .grid,
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        font-size: 37px;
+    }
+
+    .brand {
+        font-size: 11px;
+        letter-spacing: 1px;
+    }
+
+    nav button {
+        padding: 9px 11px;
+        font-size: 12px;
+    }
+
+    .login-card {
+        padding: 28px 20px;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND MUSIC JEKPRA W -->
+<audio id="backgroundMusic" loop preload="auto">
+    <source src="lagu10.mp3" type="audio/mpeg">
+    Browser kamu tidak mendukung audio.
+</audio>
+
+<canvas id="particles" aria-hidden="true"></canvas>
+
+
+<!-- =====================================
+     HALAMAN LOGIN
+===================================== -->
+
+<section id="loginScreen">
+
+    <div class="login-card">
+
+        <div class="logo">JekWebs</div>
+
+        <div class="login-icon">
+    <img src="jekpraw1.jpg" alt="Foto Saya">
+        </div>
+
+        <h1>Selamat Datang di Website JekPraw</h1>
+
+        <p>
+            Disini gue mau perkenalkan ke lo pada, Project Website sederhana
+          yang gue buat, Website ini berfokus pada Introduce Self ( biodata )
+          personal ya.
+        </p>
+
+        <form id="loginForm">
+
+            <input
+                type="text"
+                id="loginName"
+                placeholder="Masukkan kode kamu..."
+                maxlength="40"
+                autocomplete="given-name"
+                required
+            >
+
+            <button class="btn primary" type="submit">
+                🔓 ENTER SYSTEM
+            </button>
+
+        </form>
+
+        <p class="login-note">
+            KODE : JEK
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     APLIKASI UTAMA
+===================================== -->
+
+<div id="app" class="hidden">
+
+<header>
+
+    <div class="navbar">
+
+        <div class="brand">
+            JEKPRAW<span></span>
+        </div>
+
+        <div class="nav-actions">
+
+            <span id="clock"
+            class="muted"
+            style="font-size:12px">
+                --:--:--
+            </span>
+
+            <button class="icon-btn"
+            id="themeButton"
+            aria-label="Ganti tema">
+                ☀️
+            </button>
+
+<button class="icon-btn"
+id="musicButton"
+type="button"
+aria-label="Matikan musik"
+aria-pressed="false">
+    🔇
+</button>
+
+            <button class="icon-btn"
+            id="logoutButton"
+            aria-label="Keluar">
+                ↪
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <nav aria-label="Navigasi utama">
+
+        <button class="active" data-page="home">
+            🏠 Home
+        </button>
+
+        <button data-page="about">
+            👤 Tentang Gue
+        </button>
+
+        <button data-page="skills">
+            💻 Hobi 
+        </button>
+
+        <button data-page="projects">
+            🚀 Mini Project 
+        </button>
+
+<button data-page="minigames">
+    🎮 Mini Games
+</button>
+
+        <button data-page="goals">
+            🎯 Goals
+        </button>
+
+        <button data-page="contact">
+            📩 Media Sosial
+        </button>
+
+        <button data-page="settings">
+            ⚙️ Settings
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="container">
+
+
+<!-- =====================================
+     DASHBOARD
+===================================== -->
+
+<section id="home" class="page active">
+
+    <div class="hero">
+
+        <div class="hero-content">
+
+            <div class="status">
+                <span class="status-dot"></span>
+                SYSTEM ONLINE
+            </div>
+
+            <div class="section-label">
+                Hai Guys // I'M JEKPRAW
+            </div>
+
+            <h1>
+                <span id="heroName" class="highlight">
+                    JEKPRAW
+                </span>
+            </h1>
+
+            <div class="typing" id="typingText">
+                Student & Future Programmer
+            </div>
+
+            <p id="heroDescription">
+                Selamat Datang guys diprogram kecil-kecilan gue
+              disini gue mau jelasin tentang diri gue lebih detail
+              yaa walaupun ga terlalu guna juga si
+              lo bisa bebas explore disini
+              ENJOYY.
+            </p>
+
+            <div class="btn-row">
+
+                <button class="btn primary"
+                data-go="about">
+                    👤 Kenali Gue!
+                </button>
+
+                <button class="btn"
+                data-go="projects">
+                    🚀 Lihat Proyek
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-orb">
+    <img src="jekpraw1.jpg" alt="Foto Gue">
+        </div>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat">
+            <strong id="projectCount">Nama Lengkap</strong>
+            <span>Muhammad Dzakiyy Prawira</span>
+        </div>
+
+        <div class="stat">
+            <strong id="skillCount">Asal Daerah</strong>
+            <span>Bandar Lampung</span>
+        </div>
+
+        <div class="stat">
+            <strong>Asal Sekolah</strong>
+            <span>SMAT Krida Nusantara</span>
+        </div>
+
+    </div>
+
+
+    <div class="section-heading">
+
+        <div class="section-label">QUICK ACCESS</div>
+
+        <h2>Explore My Universe</h2>
+
+        <p>
+            Temukan informasi tentang gue
+            melalui halaman-halaman berikut.
+        </p>
+
+    </div>
+
+
+    <div class="grid">
+
+        <div class="card">
+            <div class="card-icon">👤</div>
+            <h3>Jekpraw's biodata</h3>
+            <p>
+                Kenali identitas, kepribadian,
+                dan hal-hal yang gue sukai.
+            </p>
+            <button class="btn" data-go="about">
+                Selengkapnya →
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">💻</div>
+            <h3>Hobi gue</h3>
+            <p>
+                Hal yang paling gue suka nih
+              dan sedikit gue kuasai.
+            </p>
+            <button class="btn" data-go="skills">
+                Lihat Skills →
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">🚀</div>
+            <h3>Projects gue</h3>
+            <p>
+                Kumpulan proyek dan eksperimen
+                yang sedang gue bangun.
+            </p>
+            <button class="btn" data-go="projects">
+                Lihat Proyek →
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     ABOUT ME
+===================================== -->
+
+<section id="about" class="page">
+
+    <div class="section-heading">
+
+        <div class="section-label">WHO AM I?</div>
+
+        <h2>About JekPraw 👤</h2>
+          <img
+    src="jekpraw6.jpg"
+    alt="About JekPraw"
+    class="about-photo"
+            width="15000"
+            
+        <p>
+            Gue orangnya engga bisa serius jir
+          bahkan kalo ada hal yang serius gue
+          bisa aja bercanda, bego emang.
+          Sekarang gue lagi Falling in Love sama
+          seseorang lho, tau ga lo pada?.
+        </p>
+
+    </div>
+
+
+    <div class="grid">
+
+        <div class="card">
+            <div class="card-icon">🧑</div>
+            <h3>Identitas</h3>
+          <img
+    src="jekpraw2.png"
+    alt="Foto JekPraw"
+    class="profile-photo"
+            width="200"
+>
+          
+            <p>
+                Nama: JekPraw ( Dzakiyy Prawira )
+                <strong id="aboutName">JekPraw</strong>
+                <br><br>
+                Status: Krinuzen
+                <br><br>
+                Fokus: Belajar Progammer dan Coding serta Mendapatkan Hatimu.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">🔥</div>
+            <h3>Kepribadian</h3>
+          <img
+    src="jekpraw5.png"
+    alt="Foto JekPraw"
+    class="profile-photo"
+            width="200"
+            <p>
+                Gue ingin menjadi pribadi yang
+                kreatif, konsisten, mau belajar
+                dari kesalahan, dan tidak takut
+                mencoba hal baru.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">🎮</div>
+            <h3>Hobi</h3>
+          <img
+    src="jekpraw3.jpg"
+    alt="Foto JekPraw"
+    class="profile-photo"
+            width="200"
+            <p>
+                Coding, mengeksplorasi teknologi,
+                bermain Mobile Legend, mendengarkan musik,
+                dan berusaha mendapatkan hatimu.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="card" style="margin-top:20px">
+
+        <h3>Kisah gue</h3>
+
+        <p id="aboutStory">
+            Gue memulai perjalanan coding dari
+            rasa penasaran tentang bagaimana
+            website dan aplikasi dibuat.
+            Sekarang gue terus belajar agar
+            bisa menciptakan karya sendiri,
+          dan sekarang Alhamdulillah gue bisa buat Website
+          sederhana yang lo pada akses ini.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     SKILLS
+===================================== -->
+
+<section id="skills" class="page">
+
+    <div class="section-heading">
+
+        <div class="section-label">TECHNICAL DATABASE</div>
+
+        <h2>Hobi gue 💻</h2>
+
+        <p>
+            beberapa hobi yang gue gemari
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="skill">
+
+            <div class="skill-info">
+                <span>Coding & Membuat Program</span>
+                <span>85%</span>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar"
+                data-width="85%"></div>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-info">
+                <span>Main Game</span>
+                <span>60%</span>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar"
+                data-width="60%"></div>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-info">
+                <span>Gym</span>
+                <span>50%</span>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar"
+                data-width="50%"></div>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-info">
+                <span>Mencintaimu</span>
+                <span>100%</span>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar"
+                data-width="100%"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card" style="margin-top:20px">
+
+        <h3>Kata kata dari gue</h3>
+
+        <p>
+           obat yang pahit aja bisa menyembuhkan luka
+          tapi kenapa kamu yang begitu manis malah membuat luka.
+          anjay damn ga bro?.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     PROJECTS
+===================================== -->
+
+<section id="projects" class="page">
+
+    <div class="section-heading">
+
+        <div class="section-label">MY WORKSPACE</div>
+
+        <h2>Projects Gue 🚀</h2>
+
+        <p>
+            projek gue masih simpel 
+          dan terkesan sederhana, boleh lo pada nilai ya.
+        </p>
+
+    </div>
+
+
+    <div class="grid">
+
+
+<div class="card">
+    <div class="card-icon">🌐</div>
+
+    <h3>Website Perdana</h3>
+
+    <p>Projek Website pertama gue yang dimana gue mempelajari seluruh komponen disana, Dimana kekurangan serta kesalahan nya hingga bisa membuat website ini</p>
+
+    <div class="tags">
+        <span>HTML</span>
+        <span>CSS</span>
+    </div>
+
+    <a href="https://putra4k27-prog.github.io/SpecialLetter/indeks.html"
+       class="project-btn"
+       target="_blank"
+       rel="noopener noreferrer">
+        🚀 Lihat Proyek
+    </a>
+</div>
+
+
+
+        
+<div class="card">
+    <div class="card-icon">💌</div>
+
+    <h3>Digital Letter</h3>
+
+    <p>Mempelajari cara pembuatan surat digital dengan tema yang unik, futuristik dan memiliki fungsi yang berlimpah</p>
+
+    <div class="tags">
+        <span>HTML</span>
+        <span>CSS</span>
+    </div>
+
+    <a href="https://websjekpraw.github.io/Flower/bita.html"
+       class="project-btn"
+       target="_blank"
+       rel="noopener noreferrer">
+        🚀 Lihat Proyek
+    </a>
+</div>
+
+
+
+        <div class="card">
+    <div class="card-icon">🚀</div>
+
+    <h3>Mini Game</h3>
+
+    <p>Website game perdana gue, Gue lebih tertarik kepada Web Developer maka dari itu pembuatan game gue kurang menarik</p>
+
+    <div class="tags">
+        <span>HTML</span>
+        <span>CSS</span>
+    </div>
+
+    <a href="https://websjekpraw.github.io/MiniGames/minigame.html"
+       class="project-btn"
+       target="_blank"
+       rel="noopener noreferrer">
+        🚀 Lihat Proyek
+    </a>
+        </div>
+
+    </div>
+
+</section>
+
+  
+<!-- =====================================
+     MINI GAMES — CYBER STRIKE
+===================================== -->
+
+<section id="minigames" class="page">
+
+    <div class="section-heading">
+        <div class="section-label">ARCADE // COMBAT SYSTEM</div>
+        <h2>JEKPRAW CYBER STRIKE <span class="highlight">2077</span></h2>
+        <p>
+            Bertahan dari serangan drone digital.
+            Hancurkan musuh, tingkatkan combo,
+            dan jadilah legenda Cyber City.
+        </p>
+    </div>
+
+    <div class="cs-shell">
+
+        <div class="cs-topbar">
+            <div>
+                <span class="cs-indicator"></span>
+                <strong>MANGLAYANG COMBAT SYSTEM</strong>
+            </div>
+            <span id="csStatus">SYSTEM READY</span>
+        </div>
+
+        <div class="cs-hud">
+            <div class="cs-stat">
+                <small>SCORE</small>
+                <strong id="csScore">000000</strong>
+            </div>
+            <div class="cs-stat">
+                <small>HIGH SCORE</small>
+                <strong id="csHigh">000000</strong>
+            </div>
+            <div class="cs-stat">
+                <small>WAVE</small>
+                <strong id="csWave">01</strong>
+            </div>
+            <div class="cs-stat">
+                <small>COMBO</small>
+                <strong id="csCombo">x0</strong>
+            </div>
+        </div>
+
+        <div class="cs-health">
+            <div class="cs-health-label">
+                <span>HULL INTEGRITY</span>
+                <strong id="csHpText">100 / 100</strong>
+            </div>
+            <div class="cs-track">
+                <div id="csHpBar" class="cs-hp-fill"></div>
+            </div>
+            <div class="cs-health-label cs-shield-label">
+                <span>ENERGY SHIELD</span>
+                <strong id="csShieldText">100%</strong>
+            </div>
+            <div class="cs-track">
+                <div id="csShieldBar" class="cs-shield-fill"></div>
+            </div>
+        </div>
+
+        <div class="cs-arena" id="csArena">
+
+            <canvas id="csCanvas"
+                aria-label="Arena game Cyber Strike"></canvas>
+
+            <div id="csOverlay" class="cs-overlay">
+                <div class="cs-overlay-box">
+                    <div class="cs-mini-logo">J E K W E B S // ARCADE</div>
+                    <h3 id="csOverlayTitle">CYBER STRIKE</h3>
+                    <p id="csOverlayText">
+                        Drone musuh terdeteksi.
+                        Siapkan senjata dan bertahanlah!
+                    </p>
+                    <button id="csStart" class="cs-button">
+                        ▶ MULAI MISI
+                    </button>
+                </div>
+            </div>
+
+            <div id="csToast" class="cs-arena-toast"></div>
+
+            <div class="cs-arena-label">
+                SECTOR 07 // NIGHT CITY
+            </div>
+
+        </div>
+
+        <div class="cs-controls">
+
+            <button id="csPause" class="cs-button" disabled>
+                ⏸ PAUSE
+            </button>
+
+            <button id="csSpecial" class="cs-button cs-special" disabled>
+                ⚡ EMP BLAST
+            </button>
+
+            <button id="csSound" class="cs-button">
+                🔊 SOUND ON
+            </button>
+
+        </div>
+
+        <div class="cs-loadout">
+            <h3>WEAPON LOADOUT</h3>
+            <p>Pilih senjata untuk menyesuaikan strategi tempur.</p>
+
+            <div class="cs-weapons">
+                <button class="cs-weapon selected" data-weapon="blaster">
+                    <span>🔹</span>
+                    <strong>BLASTER</strong>
+                    <small>Damage seimbang</small>
+                </button>
+
+                <button class="cs-weapon" data-weapon="rapid">
+                    <span>⚡</span>
+                    <strong>RAPID FIRE</strong>
+                    <small>Tembakan cepat</small>
+                </button>
+
+                <button class="cs-weapon" data-weapon="plasma">
+                    <span>💜</span>
+                    <strong>PLASMA</strong>
+                    <small>Damage tinggi</small>
+                </button>
+            </div>
+        </div>
+
+        <div class="cs-guide">
+            <h3>COMBAT MANUAL</h3>
+            <p>🖱️ <b>PC:</b> Gerakkan mouse untuk mengarahkan pesawat, tahan klik untuk menembak.</p>
+            <p>📱 <b>HP:</b> Geser jari untuk menggerakkan pesawat dan menembak otomatis.</p>
+            <p>⌨️ <b>Keyboard:</b> A/D atau ←/→ untuk bergerak, SPACE untuk menembak, Q untuk EMP.</p>
+            <p>🛡️ <b>Shield:</b> Energi pulih perlahan. Gunakan EMP untuk menghancurkan musuh di layar.</p>
+            <p>👾 <b>Strategi:</b> Hindari drone dan peluru merah. Musuh yang lolos mengurangi integritas pesawat.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     GOALS
+===================================== -->
+
+<section id="goals" class="page">
+
+    <div class="section-heading">
+
+        <div class="section-label">FUTURE MINDMAP</div>
+
+        <h2>List Pencapaian Yang Harus Gue Kejar 🎯</h2>
+
+        <p>
+            Tandai tujuan yang sudah gue capai.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="goal-item">
+
+            <input type="checkbox" class="goal-check"
+            id="goal1">
+
+            <div>
+                <strong>Membahagiakan Orang Tua</strong>
+                <p>
+                    Misi pertama dan Utama gue yaitu, Membahagiakan
+                  kedua orang tua gue, Gue harus bisa membuat kedua Orang Tua
+                  gue bahagia dimasa tua nya dan Menangis
+                  Bahagia karena Kesuksesan gue, Bunda & Ayah tunggu
+                  Aku sukses dan membahagiakan kalian ya.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="goal-item">
+
+            <input type="checkbox" class="goal-check"
+            id="goal2">
+
+            <div>
+                <strong>Keterima STAN atau ITB</strong>
+                <p>
+                    STAN ( Sekolah Tinggi Akuntansi Negara ), dimana
+                  itu adalah cita cita pertama dan utama gue,
+                  gue bermimpi ingin menjadi OJK ( Otoritas Jasa Keuangan ) Negara
+                  Indonesia, ITB ( Institus Teknologi Bandung ) Second Choice gue
+                  dan mengambil prodi CyberSecurity dan Web Developer.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="goal-item">
+
+            <input type="checkbox" class="goal-check"
+            id="goal3">
+
+            <div>
+                <strong>Menjadi CyberSecurity</strong>
+                <p>
+                    Menjadi seorang CyberSecurity yang
+                  mengamankan sandi Negara Indonesia, dan
+                  memberantas keamanan serta sandi negara lain.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="goal-item">
+
+            <input type="checkbox" class="goal-check"
+            id="goal4">
+
+            <div>
+                <strong>Mendapatkan Hati Seseorang</strong>
+                <p>
+                    Bisa mendapatkan hati seseorang yang sangat spesial buat gue,
+                  seseorang itu selalu menjadi Support System gue setiap hari, jadi alasan
+                  gue untuk semangat sekolah, yaa walaupun gue jarang ngobrol sih sama dia
+                  karena emang gue belum ada mental juga hehe, seseorang itu adalah : Tsabitta Azzahra☺️.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div style="margin-top:25px">
+
+            <p class="muted"
+            style="margin-bottom:12px">
+                Progress tujuan:
+                <strong id="goalProgress">0%</strong>
+            </p>
+
+            <div class="progress">
+                <div class="progress-bar"
+                id="goalProgressBar"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     CONTACT
+===================================== -->
+
+<section id="contact" class="page">
+
+    <div class="section-heading">
+
+        <div class="section-label">CONNECT WITH ME</div>
+
+        <h2>Medsos Gue 📩</h2>
+
+        <p>
+            Follow atuh medsos gue, Ada pepatah mengatakan "Tidak kenal maka tak sayang, Kalo udh kenal maka panggil aja aku sayang".
+        </p>
+
+    </div>
+
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-icon">📧</div>
+
+            <h3>Tiktok</h3>
+
+            <p id="contactTiktok">
+                @dzkyyprwira
+            </p>
+
+            <button class="btn"
+            data-copy="tiktok">
+                Salin Tiktok
+            </button>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-icon">📱</div>
+
+            <h3>Instagram</h3>
+
+            <p id="contactInstagram">
+                @prawaameg & @dzkyyprwira
+            </p>
+
+            <button class="btn"
+            data-copy="instagram">
+                Salin Username
+            </button>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-icon">🌍</div>
+
+            <h3>JekWebs</h3>
+
+            <p>
+                Website Bertema CyberPunk Sederhana.
+            </p>
+
+            <button class="btn"
+            data-go="home">
+                Kembali ke Home
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="card" style="margin-top:20px">
+
+        <h3>Download Profile Gue</h3>
+
+        <p>
+            siapa tau mau lo simpen kan, 
+          jangan hanya simpen di file ya 
+          simpen juga dihati lo, wkwk.
+        </p>
+
+        <button class="btn primary"
+        id="downloadProfile">
+            📥 Download Profile TXT
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     SETTINGS
+===================================== -->
+
+<section id="settings" class="page">
+
+    <div class="section-heading">
+
+        <div class="section-label">SYSTEM CONFIGURATION</div>
+
+        <h2>Setting Profile ⚙️</h2>
+
+        <p>
+            Sesuaikan informasi, 
+            disini lo bebas mengubah profil gue jdi profil lo.
+        </p>
+
+    </div>
+
+
+    <div class="form-box">
+
+        <label for="editName">
+            Nama Lengkap
+        </label>
+
+        <input
+            id="editName"
+            maxlength="40"
+            placeholder="Masukkan nama lengkap"
+        >
+
+
+        <label for="editRole">
+            Profesi atau Status
+        </label>
+
+        <input
+            id="editRole"
+            maxlength="100"
+            placeholder="Contoh: Pelajar & Future Developer"
+        >
+
+
+        <label for="editDescription">
+            Deskripsi Singkat
+        </label>
+
+        <textarea
+            id="editDescription"
+            maxlength="500"
+            placeholder="Ceritakan tentang dirimu..."
+        ></textarea>
+
+
+        <label for="editStory">
+            Cerita Tentang Dirimu
+        </label>
+
+        <textarea
+            id="editStory"
+            maxlength="1000"
+            placeholder="Tuliskan perjalananmu..."
+        ></textarea>
+
+
+        <label for="editEmail">
+            Email
+        </label>
+
+        <input
+            id="editEmail"
+            type="email"
+            maxlength="100"
+            placeholder="emailkamu@example.com"
+        >
+
+
+        <label for="editInstagram">
+            Username Instagram
+        </label>
+
+        <input
+            id="editInstagram"
+            maxlength="100"
+            placeholder="@usernamekamu"
+        >
+
+
+        <div class="btn-row"
+        style="margin-top:20px">
+
+            <button class="btn primary"
+            id="saveSettings">
+                💾 Simpan Profil
+            </button>
+
+            <button class="btn"
+            id="resetSettings">
+                ↻ Reset Profil
+            </button>
+
+        </div>
+
+        <p class="muted"
+        style="font-size:12px;line-height:1.8;margin-top:20px">
+
+            Data profil disimpan di browser
+            perangkat ini jika localStorage tersedia.
+            Jangan masukkan informasi pribadi
+            yang tidak ingin kamu bagikan.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<footer>
+
+    <p>JekWebs.com // CYBERPUNK EDITION</p>
+
+    <p>Designed with 💜 and Semangat Penuh</p>
+
+    <p id="footerYear"></p>
+
+</footer>
+
+</div>
+
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+
+<script>
+
+/* =====================================
+   1. KONFIGURASI LOGIN
+===================================== */
+
+/*
+   GANTI "jek" DENGAN NAMA LOGIN KAMU.
+
+   Ini bukan autentikasi yang aman karena
+   kode bisa dibaca dari browser.
+*/
+
+const ALLOWED_NAME = "jek";
+
+
+/* =====================================
+   2. DATA DEFAULT
+===================================== */
+
+const defaultProfile = {
+    name: "JEKPRAW",
+    role: "Krinuzen XXX",
+    description:
+        "Welcome to my little Cyber Website, Disini gue mau memperkenalkan lebih dalam tentang diri gue sendiri kepada lo semua dengan website sederhana bertema cyber.",
+    story:
+        "Gue memulai perjalanan coding dari rasa penasaran tentang bagaimana website dan aplikasi dibuat. Sekarang gue terus belajar agar bisa menciptakan karya sendiri, Alhamdulillah sekarang gue bisa buat website sederhana ini.",
+    tiktok: "dzkyyprwira",
+    instagram: "@prawaameg & @dzkyyprwira"
+};
+
+let profile = { ...defaultProfile };
+
+
+/* =====================================
+   3. ELEMEN HTML
+===================================== */
+
+const loginScreen = document.getElementById("loginScreen");
+const app = document.getElementById("app");
+const loginName = document.getElementById("loginName");
+const toast = document.getElementById("toast");
+
+
+/* =====================================
+   4. NOTIFIKASI
+===================================== */
+
+let toastTimer;
+
+function notify(message) {
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+
+}
+
+
+/* =====================================
+   5. MEMUAT PROFIL
+===================================== */
+
+function loadProfile() {
+
+    try {
+
+        const saved =
+            localStorage.getItem("cyberProfile");
+
+        if (saved) {
+
+            const parsed = JSON.parse(saved);
+
+            profile = {
+                ...defaultProfile,
+                ...parsed
+            };
+
+        }
+
+    } catch (error) {
+
+        profile = { ...defaultProfile };
+
+    }
+
+    applyProfile();
+
+}
+
+
+function applyProfile() {
+
+    document.getElementById("heroName").textContent =
+        profile.name;
+
+    document.getElementById("aboutName").textContent =
+        profile.name;
+
+    document.getElementById("heroDescription").textContent =
+        profile.description;
+
+    document.getElementById("aboutStory").textContent =
+        profile.story;
+
+    document.getElementById("contactEmail").textContent =
+        profile.email;
+
+    document.getElementById("contactInstagram").textContent =
+        profile.instagram;
+
+    document.getElementById("editName").value =
+        profile.name === "YOUR NAME" ? "" : profile.name;
+
+    document.getElementById("editRole").value =
+        profile.role;
+
+    document.getElementById("editDescription").value =
+        profile.description;
+
+    document.getElementById("editStory").value =
+        profile.story;
+
+    document.getElementById("editEmail").value =
+        profile.email === "emailkamu@example.com"
+        ? ""
+        : profile.email;
+
+    document.getElementById("editInstagram").value =
+        profile.instagram === "@usernamekamu"
+        ? ""
+        : profile.instagram;
+
+    updateTypingRoles();
+
+}
+
+
+/* =====================================
+   6. LOGIN
+===================================== */
+
+document.getElementById("loginForm")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const name = loginName.value.trim();
+
+    if (!name) {
+        notify("Masukkan nama terlebih dahulu.");
+        return;
+    }
+
+    if (
+        name.toLocaleLowerCase("id-ID") !==
+        ALLOWED_NAME.toLocaleLowerCase("id-ID")
+    ) {
+        notify("Nama tidak sesuai. Coba lagi.");
+        return;
+    }
+
+    loginScreen.classList.add("hidden");
+    app.classList.remove("hidden");
+
+    loadProfile();
+
+    notify("Akses diterima. Selamat datang! 🚀");
+
+});
+
+
+/* =====================================
+   7. LOGOUT
+===================================== */
+
+document.getElementById("logoutButton")
+.addEventListener("click", function() {
+
+    app.classList.add("hidden");
+    loginScreen.classList.remove("hidden");
+
+    loginName.value = "";
+
+    notify("Kamu telah keluar.");
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+});
+
+
+/* =====================================
+   8. NAVIGASI
+===================================== */
+
+function showPage(pageId) {
+
+    const target = document.getElementById(pageId);
+
+    if (!target || !target.classList.contains("page")) {
+        return;
+    }
+
+    document.querySelectorAll(".page")
+    .forEach(page => {
+        page.classList.remove("active");
+    });
+
+    target.classList.add("active");
+
+    document.querySelectorAll("nav button")
+    .forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.page === pageId
+        );
+
+    });
+
+    if (pageId === "skills") {
+        animateSkills();
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+document.querySelectorAll("nav button")
+.forEach(button => {
+
+    button.addEventListener("click", () => {
+        showPage(button.dataset.page);
+    });
+
+});
+
+
+document.querySelectorAll("[data-go]")
+.forEach(button => {
+
+    button.addEventListener("click", () => {
+        showPage(button.dataset.go);
+    });
+
+});
+
+
+/* =====================================
+   9. JAM DIGITAL
+===================================== */
+
+function updateClock() {
+
+    document.getElementById("clock").textContent =
+        new Date().toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+
+}
+
+updateClock();
+
+setInterval(updateClock, 1000);
+
+document.getElementById("footerYear").textContent =
+    new Date().getFullYear();
+
+
+/* =====================================
+   10. GANTI TEMA
+===================================== */
+
+const themeButton = document.getElementById("themeButton");
+
+let currentTheme = "cyberpunk";
+
+try {
+
+    currentTheme =
+        localStorage.getItem("cyberTheme") || "cyberpunk";
+
+} catch (error) {
+
+    currentTheme = "cyberpunk";
+
+}
+
+
+function applyTheme(theme) {
+
+    document.body.classList.toggle(
+        "modern",
+        theme === "modern"
+    );
+
+    themeButton.textContent =
+        theme === "modern" ? "🌙" : "☀️";
+
+}
+
+
+applyTheme(currentTheme);
+
+
+themeButton.addEventListener("click", function() {
+
+    currentTheme =
+        document.body.classList.contains("modern")
+        ? "cyberpunk"
+        : "modern";
+
+    applyTheme(currentTheme);
+
+    try {
+
+        localStorage.setItem(
+            "cyberTheme",
+            currentTheme
+        );
+
+    } catch (error) {}
+
+    notify(
+        currentTheme === "modern"
+        ? "Tema Modern aktif."
+        : "Tema Cyberpunk aktif."
+    );
+
+});
+
+
+/* =====================================
+   11. TYPING EFFECT
+===================================== */
+
+let roles = [
+    "Krinuzen XXX",
+    "STAN atau ITB ya?",
+    "Manglayang Power",
+    "Programmer 2028"
+];
+
+let roleIndex = 0;
+let charIndex = 0;
+let deleting = false;
+
+const typingText = document.getElementById("typingText");
+
+
+function updateTypingRoles() {
+
+    roles = [
+        profile.role || "Krinuzen XXX",
+        "STAN atau ITB ya?",
+        "Manglayang Power",
+        "Programmer 2028"
+    ];
+
+}
+
+
+function typeEffect() {
+
+    if (document.hidden) {
+        setTimeout(typeEffect, 1000);
+        return;
+    }
+
+    const currentRole = roles[roleIndex];
+
+    if (deleting) {
+
+        charIndex--;
+
+    } else {
+
+        charIndex++;
+
+    }
+
+    typingText.textContent =
+        currentRole.substring(0, charIndex);
+
+    let delay = deleting ? 45 : 85;
+
+    if (!deleting && charIndex === currentRole.length) {
+
+        deleting = true;
+        delay = 1400;
+
+    } else if (deleting && charIndex === 0) {
+
+        deleting = false;
+        roleIndex = (roleIndex + 1) % roles.length;
+        delay = 350;
+
+    }
+
+    setTimeout(typeEffect, delay);
+
+}
+
+typeEffect();
+
+
+/* =====================================
+   12. SKILL ANIMATION
+===================================== */
+
+function animateSkills() {
+
+    document.querySelectorAll(".progress-bar[data-width]")
+    .forEach(bar => {
+
+        bar.style.width = "0";
+
+        requestAnimationFrame(() => {
+
+            bar.style.width = bar.dataset.width;
+
+        });
+
+    });
+
+}
+
+
+/* =====================================
+   13. PROYEK INTERAKTIF
+===================================== */
+
+document.querySelectorAll("[data-demo]")
+.forEach(button => {
+
+    button.addEventListener("click", function() {
+
+        const projectName = this.dataset.demo;
+
+        notify(
+            projectName +
+            " adalah contoh proyek. Ganti dengan detail proyekmu!"
+        );
+
+    });
+
+});
+
+
+/* =====================================
+   14. SALIN KONTAK
+===================================== */
+
+async function copyText(text) {
+
+    try {
+
+        await navigator.clipboard.writeText(text);
+
+        notify("Berhasil disalin!");
+
+    } catch (error) {
+
+        const area = document.createElement("textarea");
+
+        area.value = text;
+
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+
+        document.body.appendChild(area);
+
+        area.select();
+
+        const success = document.execCommand("copy");
+
+        area.remove();
+
+        notify(
+            success
+            ? "Berhasil disalin!"
+            : "Tidak dapat menyalin otomatis."
+        );
+
+    }
+
+}
+
+
+document.querySelectorAll("[data-copy]")
+.forEach(button => {
+
+    button.addEventListener("click", function() {
+
+        const type = this.dataset.copy;
+
+        const text =
+            type === "email"
+            ? profile.email
+            : profile.instagram;
+
+        copyText(text);
+
+    });
+
+});
+
+
+/* =====================================
+   15. DOWNLOAD PROFIL
+===================================== */
+
+document.getElementById("downloadProfile")
+.addEventListener("click", function() {
+
+    const content =
+`PERSONAL PROFILE
+================
+
+Nama: ${profile.name}
+
+Profesi: ${profile.role}
+
+Tentang Saya:
+${profile.description}
+
+Cerita:
+${profile.story}
+
+Email: ${profile.email}
+
+Instagram: ${profile.instagram}
+
+Dibuat dengan Cyberpunk Personal Portfolio.
+`;
+
+    const blob = new Blob(
+        [content],
+        { type: "text/plain;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "my-profile.txt";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
+
+    notify("Profil berhasil diunduh!");
+
+});
+
+
+/* =====================================
+   16. SIMPAN PENGATURAN
+===================================== */
+
+document.getElementById("saveSettings")
+.addEventListener("click", function() {
+
+    const newName =
+        document.getElementById("editName").value.trim();
+
+    const newRole =
+        document.getElementById("editRole").value.trim();
+
+    const newDescription =
+        document.getElementById("editDescription").value.trim();
+
+    const newStory =
+        document.getElementById("editStory").value.trim();
+
+    const newEmail =
+        document.getElementById("editEmail").value.trim();
+
+    const newInstagram =
+        document.getElementById("editInstagram").value.trim();
+
+
+    if (!newName) {
+        notify("Nama tidak boleh kosong.");
+        return;
+    }
+
+    if (!newRole) {
+        notify("Profesi atau status tidak boleh kosong.");
+        return;
+    }
+
+    if (
+        newEmail &&
+        !document.getElementById("editEmail").checkValidity()
+    ) {
+        notify("Format email belum benar.");
+        return;
+    }
+
+
+    profile = {
+        name: newName,
+        role: newRole,
+        description: newDescription,
+        story: newStory,
+        email: newEmail || "Belum diatur",
+        instagram: newInstagram || "Belum diatur"
+    };
+
+
+    try {
+
+        localStorage.setItem(
+            "cyberProfile",
+            JSON.stringify(profile)
+        );
+
+    } catch (error) {
+
+        notify("Browser tidak dapat menyimpan profil.");
+
+        applyProfile();
+
+        return;
+
+    }
+
+
+    applyProfile();
+
+    notify("Profil berhasil disimpan! 💾");
+
+});
+
+
+/* =====================================
+   17. RESET PROFIL
+===================================== */
+
+document.getElementById("resetSettings")
+.addEventListener("click", function() {
+
+    if (!confirm("Kembalikan profil ke data awal?")) {
+        return;
+    }
+
+    profile = { ...defaultProfile };
+
+    try {
+
+        localStorage.removeItem("cyberProfile");
+
+    } catch (error) {}
+
+    applyProfile();
+
+    notify("Profil dikembalikan ke pengaturan awal.");
+
+});
+
+
+/* =====================================
+   18. GOALS CHECKLIST
+===================================== */
+
+const goalChecks =
+    document.querySelectorAll(".goal-check");
+
+
+function updateGoals() {
+
+    let completed = 0;
+
+    goalChecks.forEach(check => {
+
+        const item = check.closest(".goal-item");
+
+        item.classList.toggle("done", check.checked);
+
+        if (check.checked) {
+            completed++;
+        }
+
+    });
+
+    const percentage = Math.round(
+        completed / goalChecks.length * 100
+    );
+
+    document.getElementById("goalProgress").textContent =
+        percentage + "%";
+
+    document.getElementById("goalProgressBar").style.width =
+        percentage + "%";
+
+
+    try {
+
+        localStorage.setItem(
+            "cyberGoals",
+            JSON.stringify(
+                Array.from(goalChecks).map(check => check.checked)
+            )
+        );
+
+    } catch (error) {}
+
+}
+
+
+try {
+
+    const savedGoals =
+        JSON.parse(localStorage.getItem("cyberGoals") || "null");
+
+    if (Array.isArray(savedGoals)) {
+
+        goalChecks.forEach((check, index) => {
+
+            check.checked = Boolean(savedGoals[index]);
+
+        });
+
+    }
+
+} catch (error) {}
+
+
+goalChecks.forEach(check => {
+
+    check.addEventListener("change", updateGoals);
+
+});
+
+updateGoals();
+
+
+/* =====================================
+   19. PARTIKEL NEON
+===================================== */
+
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+
+let particles = [];
+let canvasWidth = 0;
+let canvasHeight = 0;
+
+
+function resizeCanvas() {
+
+    const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+
+    canvasWidth = window.innerWidth;
+    canvasHeight = window.innerHeight;
+
+    canvas.width = canvasWidth * dpr;
+    canvas.height = canvasHeight * dpr;
+
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    particles = [];
+
+    const count = Math.min(
+        65,
+        Math.floor(canvasWidth / 12)
+    );
+
+    for (let i = 0; i < count; i++) {
+
+        particles.push({
+
+            x: Math.random() * canvasWidth,
+            y: Math.random() * canvasHeight,
+
+            radius: Math.random() * 1.8 + .5,
+            speed: Math.random() * .35 + .1
+
+        });
+
+    }
+
+}
+
+
+function drawParticles() {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvasWidth,
+        canvasHeight
+    );
+
+    ctx.fillStyle =
+        document.body.classList.contains("modern")
+        ? "rgba(82,104,237,.3)"
+        : "rgba(0,245,255,.65)";
+
+
+    particles.forEach(particle => {
+
+        ctx.beginPath();
+
+        ctx.arc(
+            particle.x,
+            particle.y,
+            particle.radius,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        particle.y -= particle.speed;
+
+        if (particle.y < -5) {
+
+            particle.y = canvasHeight + 5;
+
+            particle.x =
+                Math.random() * canvasWidth;
+
+        }
+
+    });
+
+    requestAnimationFrame(drawParticles);
+
+}
+
+
+resizeCanvas();
+
+window.addEventListener("resize", resizeCanvas);
+
+drawParticles();
+
+
+/* =====================================
+   20. KEYBOARD SHORTCUT
+===================================== */
+
+document.addEventListener("keydown", function(event) {
+
+    if (app.classList.contains("hidden")) {
+        return;
+    }
+
+    if (
+        event.altKey &&
+        event.key.toLowerCase() === "h"
+    ) {
+        showPage("home");
+    }
+
+});
+
+
+</script>
+
+<script>
+  
+/* ==========================================
+   CYBER STRIKE 2077 — GAME ENGINE
+========================================== */
+
+(() => {
+    "use strict";
+
+    const $ = id => document.getElementById(id);
+
+    const canvas = $("csCanvas");
+    const ctx = canvas.getContext("2d");
+    const arena = $("csArena");
+
+    const overlay = $("csOverlay");
+    const startBtn = $("csStart");
+    const pauseBtn = $("csPause");
+    const specialBtn = $("csSpecial");
+    const soundBtn = $("csSound");
+
+    if (!canvas || !ctx || !arena) return;
+
+    const ui = {
+        score: $("csScore"),
+        high: $("csHigh"),
+        wave: $("csWave"),
+        combo: $("csCombo"),
+        hp: $("csHpText"),
+        hpBar: $("csHpBar"),
+        shield: $("csShieldText"),
+        shieldBar: $("csShieldBar"),
+        status: $("csStatus"),
+        title: $("csOverlayTitle"),
+        text: $("csOverlayText"),
+        toast: $("csToast")
+    };
+
+    const weapons = {
+        blaster: {
+            name: "BLASTER",
+            damage: 1,
+            delay: 240,
+            speed: 560,
+            count: 1,
+            spread: 0.0,
+            color: "#00f5ff"
+        },
+        rapid: {
+            name: "RAPID FIRE",
+            damage: 1,
+            delay: 105,
+            speed: 680,
+            count: 1,
+            spread: 0.0,
+            color: "#a5fffb"
+        },
+        plasma: {
+            name: "PLASMA",
+            damage: 3,
+            delay: 470,
+            speed: 440,
+            count: 1,
+            spread: 0.0,
+            color: "#d783ff"
+        }
+    };
+
+    let W = 0;
+    let H = 0;
+    let dpr = 1;
+    let lastFrame = 0;
+    let lastShot = 0;
+    let spawnTimer = 0;
+    let toastTimer = 0;
+    let audio = null;
+
+    let soundOn = true;
+    let running = false;
+    let paused = false;
+    let gameOver = false;
+    let started = false;
+
+    let score = 0;
+    let wave = 1;
+    let combo = 0;
+    let comboTimer = 0;
+    let kills = 0;
+
+    let hp = 100;
+    let shield = 100;
+    let emp = 1;
+    let invulnerable = 0;
+
+    let weapon = "blaster";
+    let keys = {};
+    let bullets = [];
+    let enemies = [];
+    let enemyBullets = [];
+    let particles = [];
+    let stars = [];
+
+    const player = {
+        x: 0,
+        y: 0,
+        r: 15,
+        speed: 300
+    };
+
+    let pointer = {
+        x: 0,
+        y: 0,
+        down: false,
+        active: false
+    };
+
+    function random(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    function initAudio() {
+        if (!soundOn) return;
+
+        const AudioClass =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if (!AudioClass) return;
+
+        if (!audio) audio = new AudioClass();
+
+        if (audio.state === "suspended") {
+            audio.resume().catch(() => {});
+        }
+    }
+
+    function tone(freq = 600, duration = 0.06, type = "sine") {
+        if (!soundOn || !audio) return;
+
+        const osc = audio.createOscillator();
+        const gain = audio.createGain();
+        const now = audio.currentTime;
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(
+            Math.max(40, freq * 0.55),
+            now + duration
+        );
+
+        gain.gain.setValueAtTime(0.025, now);
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            now + duration
+        );
+
+        osc.connect(gain);
+        gain.connect(audio.destination);
+
+        osc.start(now);
+        osc.stop(now + duration);
+    }
+
+    function notify(message) {
+        ui.toast.textContent = message;
+        ui.toast.classList.add("show");
+
+        clearTimeout(toastTimer);
+
+        toastTimer = setTimeout(() => {
+            ui.toast.classList.remove("show");
+        }, 1400);
+    }
+
+    function getHighScore() {
+        try {
+            return Number(
+                localStorage.getItem("csHighScore") || 0
+            );
+        } catch {
+            return 0;
+        }
+    }
+
+    function saveHighScore() {
+        try {
+            localStorage.setItem(
+                "csHighScore",
+                String(Math.max(score, getHighScore()))
+            );
+        } catch {}
+    }
+
+    function resize() {
+        const rect = arena.getBoundingClientRect();
+
+        W = Math.max(1, rect.width);
+        H = Math.max(1, rect.height);
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        player.x = clamp(player.x || W / 2, 20, W - 20);
+        player.y = H - 55;
+
+        pointer.x = clamp(pointer.x || W / 2, 20, W - 20);
+        pointer.y = clamp(pointer.y || player.y, 30, H - 25);
+
+        stars = Array.from({ length: 65 }, () => ({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: random(0.5, 1.7),
+            speed: random(12, 55)
+        }));
+    }
+
+    function updateHUD() {
+        ui.score.textContent = String(score).padStart(6, "0");
+        ui.high.textContent = String(
+            Math.max(score, getHighScore())
+        ).padStart(6, "0");
+
+        ui.wave.textContent = String(wave).padStart(2, "0");
+        ui.combo.textContent = "x" + combo;
+
+        ui.hp.textContent = `${Math.ceil(hp)} / 100`;
+        ui.hpBar.style.width = hp + "%";
+
+        ui.shield.textContent = Math.floor(shield) + "%";
+        ui.shieldBar.style.width = shield + "%";
+
+        specialBtn.textContent =
+            `⚡ EMP BLAST (${emp})`;
+
+        specialBtn.disabled = !running || paused || emp <= 0;
+        pauseBtn.disabled = !running && !paused;
+
+        soundBtn.textContent = soundOn
+            ? "🔊 SOUND ON"
+            : "🔇 SOUND OFF";
+    }
+
+    function setOverlay(title, text, buttonText) {
+        ui.title.textContent = title;
+        ui.text.textContent = text;
+        startBtn.textContent = buttonText;
+        overlay.classList.remove("hidden");
+    }
+
+    function resetGame() {
+        score = 0;
+        wave = 1;
+        combo = 0;
+        comboTimer = 0;
+        kills = 0;
+
+        hp = 100;
+        shield = 100;
+        emp = 1;
+        invulnerable = 0;
+
+        bullets = [];
+        enemies = [];
+        enemyBullets = [];
+        particles = [];
+
+        spawnTimer = 0.6;
+        lastShot = 0;
+
+        player.x = W / 2;
+        player.y = H - 55;
+
+        pointer.down = false;
+        pointer.active = false;
+
+        gameOver = false;
+        paused = false;
+        running = true;
+        started = true;
+
+        lastFrame = performance.now();
+
+        ui.status.textContent = "COMBAT ACTIVE";
+        pauseBtn.textContent = "⏸ PAUSE";
+
+        overlay.classList.add("hidden");
+
+        updateHUD();
+        tone(500, 0.12);
+    }
+
+    function endGame() {
+        running = false;
+        paused = false;
+        gameOver = true;
+
+        pointer.down = false;
+        saveHighScore();
+        updateHUD();
+
+        ui.status.textContent = "MISSION FAILED";
+
+        setOverlay(
+            "GAME OVER",
+            `Skor: ${score} • Wave: ${wave} • Eliminasi: ${kills}. Coba lagi dan pecahkan rekor!`,
+            "↻ MAIN LAGI"
+        );
+
+        tone(180, 0.3, "sawtooth");
+    }
+
+    function togglePause() {
+        if (!started || gameOver) return;
+
+        paused = !paused;
+        pointer.down = false;
+
+        if (paused) {
+            ui.status.textContent = "SYSTEM PAUSED";
+            pauseBtn.textContent = "▶ LANJUT";
+            setOverlay(
+                "PAUSED",
+                "Sistem tempur dihentikan sementara.",
+                "▶ LANJUTKAN"
+            );
+        } else {
+            ui.status.textContent = "COMBAT ACTIVE";
+            pauseBtn.textContent = "⏸ PAUSE";
+            overlay.classList.add("hidden");
+            lastFrame = performance.now();
+        }
+
+        updateHUD();
+    }
+
+    function spawnEnemy() {
+        const roll = Math.random();
+
+        let type = "drone";
+
+        if (wave >= 3 && roll > 0.78) {
+            type = "tank";
+        } else if (wave >= 2 && roll > 0.48) {
+            type = "swift";
+        }
+
+        const config = {
+            drone: {
+                r: 13, hp: 2, speed: 65,
+                color: "#ff477e", score: 100
+            },
+            swift: {
+                r: 10, hp: 1, speed: 125,
+                color: "#ffb347", score: 150
+            },
+            tank: {
+                r: 20, hp: 6, speed: 38,
+                color: "#c56bff", score: 300
+            }
+        }[type];
+
+        enemies.push({
+            ...config,
+            type,
+            x: random(25, W - 25),
+            y: -25,
+            phase: random(0, Math.PI * 2),
+            shootTimer: random(1.5, 3.8)
+        });
+    }
+
+    function shoot() {
+        const cfg = weapons[weapon];
+
+        bullets.push({
+            x: player.x,
+            y: player.y - 17,
+            vx: 0,
+            vy: -cfg.speed,
+            r: weapon === "plasma" ? 5 : 3,
+            damage: cfg.damage,
+            color: cfg.color
+        });
+
+        if (weapon === "plasma") {
+            tone(300, 0.08, "sawtooth");
+        } else {
+            tone(900, 0.035, "square");
+        }
+    }
+
+    function useEMP() {
+        if (!running || paused || emp <= 0) return;
+
+        emp--;
+
+        enemies.forEach(enemy => {
+            burst(enemy.x, enemy.y, enemy.color, 12);
+            score += enemy.score;
+            kills++;
+        });
+
+        enemyBullets = [];
+        enemies = [];
+
+        shield = Math.min(100, shield + 15);
+
+        tone(120, 0.4, "sawtooth");
+        notify("⚡ EMP ACTIVATED — SECTOR CLEARED");
+
+        updateHUD();
+    }
+
+    function burst(x, y, color, amount = 8) {
+        for (let i = 0; i < amount; i++) {
+            const angle = random(0, Math.PI * 2);
+            const speed = random(30, 170);
+            const life = random(0.25, 0.65);
+
+            particles.push({
+                x, y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life,
+                maxLife: life,
+                color,
+                r: random(1.5, 3.5)
+            });
+        }
+    }
+
+    function damagePlayer(amount) {
+        if (invulnerable > 0 || !running) return;
+
+        if (shield > 0) {
+            const absorbed = Math.min(shield, amount * 2);
+            shield -= absorbed;
+
+            amount -= absorbed / 2;
+        }
+
+        if (amount > 0) hp -= amount;
+
+        hp = Math.max(0, hp);
+        shield = Math.max(0, shield);
+
+        invulnerable = 0.65;
+
+        burst(player.x, player.y, "#ff477e", 10);
+        tone(160, 0.12, "square");
+
+        if (hp <= 0) endGame();
+
+        updateHUD();
+    }
+
+    function hitEnemy(enemy, bullet) {
+        enemy.hp -= bullet.damage;
+
+        burst(bullet.x, bullet.y, bullet.color, 3);
+
+        if (enemy.hp <= 0) {
+            burst(enemy.x, enemy.y, enemy.color, 13);
+
+            score += enemy.score * Math.min(combo + 1, 10);
+            kills++;
+            combo++;
+            comboTimer = 2.5;
+
+            // Bonus saat mencapai combo tertentu.
+            if (combo % 10 === 0) {
+                emp++;
+                notify("COMBO x" + combo + " — EMP +1");
+                tone(1000, 0.12);
+            }
+
+            // Setiap 10 eliminasi, wave meningkat.
+            if (kills % 10 === 0) {
+                wave++;
+                hp = Math.min(100, hp + 8);
+                notify("WAVE " + wave + " — THREAT INCREASED");
+            }
+
+            updateHUD();
+            return true;
+        }
+
+        tone(420, 0.025);
+        return false;
+    }
+
+    function update(dt, now) {
+        if (!running || paused || gameOver) return;
+
+        dt = Math.min(dt, 0.035);
+
+        invulnerable = Math.max(0, invulnerable - dt);
+        comboTimer -= dt;
+
+        if (comboTimer <= 0) combo = 0;
+
+        shield = Math.min(100, shield + 3 * dt);
+
+        // Kontrol keyboard.
+        let direction = 0;
+
+        if (keys.ArrowLeft || keys.a || keys.A) direction--;
+        if (keys.ArrowRight || keys.d || keys.D) direction++;
+
+        player.x += direction * player.speed * dt;
+
+        // Kontrol sentuhan atau mouse.
+        if (pointer.active) {
+            player.x += (pointer.x - player.x) *
+                Math.min(1, dt * 12);
+
+            player.y += (pointer.y - player.y) *
+                Math.min(1, dt * 12);
+        }
+
+        player.x = clamp(player.x, 18, W - 18);
+        player.y = clamp(player.y, 25, H - 25);
+
+        if (keys.Space || pointer.down) {
+            if (now - lastShot >= weapons[weapon].delay) {
+                shoot();
+                lastShot = now;
+            }
+        }
+
+        // Spawn musuh makin cepat seiring wave.
+        spawnTimer -= dt;
+
+        if (spawnTimer <= 0) {
+            spawnEnemy();
+
+            spawnTimer = Math.max(
+                0.27,
+                1.05 - wave * 0.055
+            );
+        }
+
+        // Gerakkan peluru pemain.
+        bullets.forEach(b => {
+            b.x += b.vx * dt;
+            b.y += b.vy * dt;
+        });
+
+        bullets = bullets.filter(b => b.y > -20);
+
+        // Musuh bergerak dan sesekali menembak.
+        for (const enemy of enemies) {
+            enemy.phase += dt * 2;
+
+            enemy.x += Math.sin(enemy.phase) *
+                (enemy.type === "swift" ? 75 : 30) * dt;
+
+            enemy.y += (enemy.speed + wave * 5) * dt;
+            enemy.shootTimer -= dt;
+
+            if (enemy.shootTimer <= 0 && enemy.y > 10) {
+                const dx = player.x - enemy.x;
+                const dy = player.y - enemy.y;
+                const length = Math.hypot(dx, dy) || 1;
+                const speed = 130 + wave * 4;
+
+                enemyBullets.push({
+                    x: enemy.x,
+                    y: enemy.y + enemy.r,
+                    vx: dx / length * speed,
+                    vy: dy / length * speed,
+                    r: 4,
+                    color: "#ff386b"
+                });
+
+                enemy.shootTimer = random(2.2, 4.2);
+            }
+        }
+
+        // Tabrakan peluru pemain dengan musuh.
+        for (const bullet of bullets) {
+            if (bullet.dead) continue;
+
+            for (const enemy of enemies) {
+                if (enemy.dead) continue;
+
+                const distance = Math.hypot(
+                    bullet.x - enemy.x,
+                    bullet.y - enemy.y
+                );
+
+                if (distance < bullet.r + enemy.r) {
+                    bullet.dead = true;
+
+                    if (hitEnemy(enemy, bullet)) {
+                        enemy.dead = true;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        bullets = bullets.filter(b => !b.dead);
+        enemies = enemies.filter(e => !e.dead);
+
+        // Peluru musuh mengenai pemain.
+        for (const bullet of enemyBullets) {
+            bullet.x += bullet.vx * dt;
+            bullet.y += bullet.vy * dt;
+
+            if (Math.hypot(
+                bullet.x - player.x,
+                bullet.y - player.y
+            ) < bullet.r + player.r) {
+                bullet.dead = true;
+                damagePlayer(18);
+            }
+        }
+
+        enemyBullets = enemyBullets.filter(b =>
+            !b.dead &&
+            b.y < H + 25 &&
+            b.x > -25 &&
+            b.x < W + 25
+        );
+
+        // Musuh yang lolos tetap membahayakan pemain.
+        for (const enemy of enemies) {
+            if (enemy.y > H + enemy.r) {
+                enemy.dead = true;
+                damagePlayer(enemy.type === "tank" ? 18 : 10);
+            }
+        }
+
+        enemies = enemies.filter(e => !e.dead);
+
+        // Tabrakan langsung dengan musuh.
+        for (const enemy of enemies) {
+            if (Math.hypot(
+                enemy.x - player.x,
+                enemy.y - player.y
+            ) < enemy.r + player.r) {
+                enemy.dead = true;
+                damagePlayer(20);
+            }
+        }
+
+        enemies = enemies.filter(e => !e.dead);
+
+        // Partikel ledakan.
+        particles.forEach(p => {
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.life -= dt;
+        });
+
+        particles = particles.filter(p => p.life > 0);
+
+        // Pergerakan latar bintang.
+        stars.forEach(star => {
+            star.y += star.speed * dt;
+
+            if (star.y > H) {
+                star.y = 0;
+                star.x = Math.random() * W;
+            }
+        });
+
+        updateHUD();
+    }
+
+    function drawShip(x, y) {
+        ctx.save();
+        ctx.translate(x, y);
+
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "#00f5ff";
+        ctx.fillStyle = "#00f5ff";
+        ctx.strokeStyle = "#b5ffff";
+        ctx.lineWidth = 1.5;
+
+        ctx.beginPath();
+        ctx.moveTo(0, -18);
+        ctx.lineTo(15, 12);
+        ctx.lineTo(5, 8);
+        ctx.lineTo(0, 13);
+        ctx.lineTo(-5, 8);
+        ctx.lineTo(-15, 12);
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#07101d";
+        ctx.fillRect(-3, -5, 6, 12);
+
+        // Mesin pesawat.
+        ctx.shadowColor = "#ff36d1";
+        ctx.fillStyle = "#ff36d1";
+        ctx.fillRect(-4, 13, 3, random(5, 12));
+        ctx.fillRect(2, 13, 3, random(5, 12));
+
+        if (shield > 5) {
+            ctx.beginPath();
+            ctx.arc(0, 0, 24, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(0,245,255,${shield / 250})`;
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    function drawEnemy(enemy) {
+        ctx.save();
+        ctx.translate(enemy.x, enemy.y);
+
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = enemy.color;
+        ctx.strokeStyle = enemy.color;
+        ctx.fillStyle = enemy.color;
+        ctx.lineWidth = 2;
+
+        if (enemy.type === "tank") {
+            ctx.rotate(Math.PI / 4);
+            ctx.strokeRect(
+                -enemy.r, -enemy.r,
+                enemy.r * 2, enemy.r * 2
+            );
+            ctx.fillRect(-5, -5, 10, 10);
+        } else if (enemy.type === "swift") {
+            ctx.beginPath();
+            ctx.moveTo(0, enemy.r);
+            ctx.lineTo(-enemy.r, -enemy.r);
+            ctx.lineTo(enemy.r, -enemy.r);
+            ctx.closePath();
+            ctx.fill();
+        } else {
+            ctx.beginPath();
+            ctx.moveTo(-enemy.r, 0);
+            ctx.lineTo(0, -enemy.r);
+            ctx.lineTo(enemy.r, 0);
+            ctx.lineTo(0, enemy.r);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fillRect(-3, -3, 6, 6);
+        }
+
+        ctx.restore();
+
+        if (enemy.hp > 1) {
+            const barWidth = enemy.r * 2;
+            const ratio = clamp(
+                enemy.hp / (enemy.type === "tank" ? 6 : 2),
+                0, 1
+            );
+
+            ctx.fillStyle = "#25253c";
+            ctx.fillRect(
+                enemy.x - barWidth / 2,
+                enemy.y - enemy.r - 7,
+                barWidth, 3
+            );
+
+            ctx.fillStyle = enemy.color;
+            ctx.fillRect(
+                enemy.x - barWidth / 2,
+                enemy.y - enemy.r - 7,
+                barWidth * ratio, 3
+            );
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        // Latar cyber grid.
+        ctx.fillStyle = "#050713";
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.strokeStyle = "rgba(0,245,255,.07)";
+        ctx.lineWidth = 1;
+
+        const gridSize = 35;
+
+        for (let x = 0; x < W; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, H);
+            ctx.stroke();
+        }
+
+        for (let y = 0; y < H; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(W, y);
+            ctx.stroke();
+        }
+
+        // Bintang bergerak.
+        ctx.fillStyle = "#78faff";
+
+        stars.forEach(star => {
+            ctx.globalAlpha = 0.3 + star.r / 3;
+            ctx.fillRect(star.x, star.y, star.r, star.r);
+        });
+
+        ctx.globalAlpha = 1;
+
+        // Peluru pemain.
+        bullets.forEach(b => {
+            ctx.save();
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = b.color;
+            ctx.fillStyle = b.color;
+
+            ctx.fillRect(
+                b.x - b.r / 2,
+                b.y - 9,
+                b.r,
+                18
+            );
+
+            ctx.restore();
+        });
+
+        // Peluru musuh.
+        enemyBullets.forEach(b => {
+            ctx.save();
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = b.color;
+            ctx.fillStyle = b.color;
+
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        });
+
+        enemies.forEach(drawEnemy);
+
+        // Partikel.
+        particles.forEach(p => {
+            ctx.save();
+            ctx.globalAlpha = Math.max(
+                0, p.life / p.maxLife
+            );
+            ctx.fillStyle = p.color;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = p.color;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        });
+
+        // Pesawat pemain.
+        if (!gameOver && (invulnerable <= 0 ||
+            Math.floor(performance.now() / 90) % 2 === 0)) {
+            drawShip(player.x, player.y);
+        }
+
+        // Crosshair untuk mouse.
+        if (pointer.active && !paused) {
+            ctx.save();
+            ctx.strokeStyle = "rgba(0,245,255,.65)";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            ctx.arc(pointer.x, pointer.y, 9, 0, Math.PI * 2);
+            ctx.moveTo(pointer.x - 14, pointer.y);
+            ctx.lineTo(pointer.x + 14, pointer.y);
+            ctx.moveTo(pointer.x, pointer.y - 14);
+            ctx.lineTo(pointer.x, pointer.y + 14);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+    }
+
+    function loop(now) {
+        const dt = (now - lastFrame) / 1000;
+        lastFrame = now;
+
+        update(dt, now);
+        draw();
+
+        requestAnimationFrame(loop);
+    }
+
+    function setPointer(event) {
+        const rect = canvas.getBoundingClientRect();
+
+        pointer.x = clamp(
+            event.clientX - rect.left,
+            18,
+            W - 18
+        );
+
+        pointer.y = clamp(
+            event.clientY - rect.top,
+            25,
+            H - 25
+        );
+    }
+
+    canvas.addEventListener("pointerdown", event => {
+        if (!running || paused) return;
+
+        event.preventDefault();
+        initAudio();
+
+        pointer.active = true;
+        pointer.down = true;
+        setPointer(event);
+
+        try {
+            canvas.setPointerCapture(event.pointerId);
+        } catch {}
+    });
+
+    canvas.addEventListener("pointermove", event => {
+        if (event.pointerType === "mouse" || pointer.down) {
+            setPointer(event);
+            pointer.active = true;
+        }
+    });
+
+    function releasePointer() {
+        pointer.down = false;
+
+        // Mouse tetap dapat digunakan sebagai crosshair.
+        if (window.matchMedia("(pointer: coarse)").matches) {
+            pointer.active = false;
+        }
+    }
+
+    canvas.addEventListener("pointerup", releasePointer);
+    canvas.addEventListener("pointercancel", releasePointer);
+
+    canvas.addEventListener("pointerleave", event => {
+        if (event.pointerType === "mouse") {
+            pointer.down = false;
+            pointer.active = false;
+        }
+    });
+
+    window.addEventListener("keydown", event => {
+        if (!document.getElementById("app") ||
+            document.getElementById("app").classList.contains("hidden")) {
+            return;
+        }
+
+        if (event.code === "Space" ||
+            event.key === "ArrowLeft" ||
+            event.key === "ArrowRight") {
+            event.preventDefault();
+        }
+
+        keys[event.key] = true;
+        keys[event.code] = true;
+
+        if (event.repeat) return;
+
+        if (event.key.toLowerCase() === "q") {
+            useEMP();
+        }
+
+        if (event.key === "Escape") {
+            togglePause();
+        }
+    });
+
+    window.addEventListener("keyup", event => {
+        keys[event.key] = false;
+        keys[event.code] = false;
+    });
+
+    window.addEventListener("blur", () => {
+        keys = {};
+        pointer.down = false;
+
+        if (running && !paused) togglePause();
+    });
+
+    startBtn.addEventListener("click", () => {
+        initAudio();
+
+        if (paused && !gameOver) {
+            togglePause();
+        } else {
+            resetGame();
+        }
+    });
+
+    pauseBtn.addEventListener("click", togglePause);
+    specialBtn.addEventListener("click", useEMP);
+
+    soundBtn.addEventListener("click", () => {
+        soundOn = !soundOn;
+
+        if (soundOn) {
+            initAudio();
+            tone(700, 0.1);
+        }
+
+        updateHUD();
+    });
+
+    document.querySelectorAll(".cs-weapon").forEach(button => {
+        button.addEventListener("click", () => {
+            weapon = button.dataset.weapon;
+
+            document.querySelectorAll(".cs-weapon")
+                .forEach(item => {
+                    item.classList.toggle(
+                        "selected",
+                        item === button
+                    );
+                });
+
+            notify("WEAPON: " + weapons[weapon].name);
+            initAudio();
+            tone(650, 0.06);
+        });
+    });
+
+    // Saat halaman Mini Games dibuka, sesuaikan ukuran arena.
+    document.querySelectorAll('nav button[data-page="minigames"], [data-go="minigames"]')
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                setTimeout(resize, 100);
+            });
+        });
+
+    ui.high.textContent = String(getHighScore()).padStart(6, "0");
+
+    resize();
+
+    player.x = W / 2;
+    player.y = H - 55;
+
+    ui.status.textContent = "SYSTEM READY";
+    updateHUD();
+
+    setOverlay(
+        "CYBER STRIKE",
+        "Drone musuh terdeteksi. Hancurkan mereka, hindari peluru, dan bertahanlah selama mungkin.",
+        "▶ MULAI MISI"
+    );
+
+    window.addEventListener("resize", resize);
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && running && !paused) {
+            togglePause();
+        }
+    });
+
+    requestAnimationFrame(loop);
+})();
+
+// ========================================
+// CYBERPUNK AUDIO SYSTEM - JEKPRAW
+// ========================================
+
+(() => {
+    
+let cyberAudio = null;
+let cyberSoundOn = true;
+let lastPage = "";
+
+// Volume utama sound effect: 0.0 sampai 1.0
+let cyberVolume = 1.0;
+
+
+    function initCyberAudio() {
+        if (!cyberAudio) {
+            const AudioClass =
+                window.AudioContext ||
+                window.webkitAudioContext;
+
+            if (!AudioClass) return null;
+            cyberAudio = new AudioClass();
+        }
+
+        if (cyberAudio.state === "suspended") {
+            cyberAudio.resume().catch(() => {});
+        }
+
+        return cyberAudio;
+    }
+
+    // Generator suara digital tanpa file MP3
+    function cyberTone(
+        frequency = 800,
+        duration = 0.08,
+        type = "sine",
+        volume = 0.025,
+        endFrequency = null,
+        delay = 0
+    ) {
+        if (!cyberSoundOn) return;
+
+        const ctx = initCyberAudio();
+        if (!ctx) return;
+
+        const start = ctx.currentTime + delay;
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(
+            frequency, start
+        );
+
+        if (endFrequency !== null) {
+            oscillator.frequency.exponentialRampToValueAtTime(
+                Math.max(1, endFrequency),
+                start + duration
+            );
+        }
+
+        
+gain.gain.setValueAtTime(0.001, start);
+
+gain.gain.exponentialRampToValueAtTime(
+    Math.max(0.001, volume * cyberVolume),
+    start + 0.01
+);
+
+gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    start + duration
+);
+
+
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+
+        oscillator.start(start);
+        oscillator.stop(start + duration + 0.02);
+    }
+
+    // Suara tombol
+    function cyberClick() {
+        cyberTone(1200, 0.045, "square", 0.018, 750);
+    }
+
+    // Suara login berhasil
+    function cyberLogin() {
+        cyberTone(330, 0.16, "sawtooth", 0.025, 500, 0);
+        cyberTone(500, 0.16, "sine", 0.035, 800, 0.15);
+        cyberTone(800, 0.25, "triangle", 0.04, 1200, 0.30);
+    }
+
+    // Suara perpindahan halaman
+    function cyberPageSound() {
+        cyberTone(650, 0.07, "sine", 0.025, 950, 0);
+        cyberTone(950, 0.08, "sine", 0.02, 700, 0.07);
+    }
+
+    // Suara sistem menyala
+    function cyberBoot() {
+        cyberTone(100, 0.25, "sawtooth", 0.025, 350, 0);
+        cyberTone(350, 0.20, "triangle", 0.03, 700, 0.22);
+        cyberTone(700, 0.30, "sine", 0.035, 1100, 0.42);
+    }
+
+    // Suara peringatan
+    function cyberAlert() {
+        for (let i = 0; i < 3; i++) {
+            cyberTone(
+                880, 0.13, "square", 0.035, 620, i * 0.30
+            );
+            cyberTone(
+                620, 0.13, "square", 0.035, 880,
+                i * 0.30 + 0.15
+            );
+        }
+    }
+
+    // Tombol ON / OFF
+    const soundButton =
+        document.getElementById("cyberSoundToggle");
+
+    function updateSoundButton() {
+        if (!soundButton) return;
+
+        soundButton.textContent =
+            cyberSoundOn ? "🔊" : "🔇";
+
+        soundButton.title =
+            cyberSoundOn
+                ? "CyberPunk Sound: ON"
+                : "CyberPunk Sound: OFF";
+
+        soundButton.setAttribute(
+            "aria-pressed", String(cyberSoundOn)
+        );
+    }
+
+    if (soundButton) {
+        soundButton.addEventListener("click", () => {
+            cyberSoundOn = !cyberSoundOn;
+
+            if (cyberSoundOn) {
+                initCyberAudio();
+                cyberTone(700, 0.12, "sine", 0.03, 1000);
+            }
+
+            updateSoundButton();
+        });
+    }
+
+    updateSoundButton();
+
+    // Bunyi klik untuk tombol website
+    document.addEventListener("click", event => {
+        const button = event.target.closest("button");
+
+        if (!button || button === soundButton) return;
+        if (button.disabled) return;
+
+        cyberClick();
+    });
+
+    // Deteksi perpindahan tab navigasi
+    document.querySelectorAll("nav button[data-page]")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                const page = button.dataset.page;
+
+                if (page && page !== lastPage) {
+                    lastPage = page;
+                    cyberPageSound();
+                }
+            });
+        });
+
+    // Deteksi login sukses saat aplikasi utama ditampilkan
+    const app = document.getElementById("app");
+    const loginScreen = document.getElementById("loginScreen");
+
+    if (app && loginScreen) {
+        let wasLoggedIn = !app.classList.contains("hidden");
+
+        const loginObserver = new MutationObserver(() => {
+            const loggedIn = !app.classList.contains("hidden");
+
+            if (loggedIn && !wasLoggedIn) {
+                cyberLogin();
+                cyberBoot();
+                lastPage = "home";
+            }
+
+            wasLoggedIn = loggedIn;
+        });
+
+        loginObserver.observe(app, {
+            attributes: true,
+            attributeFilter: ["class"]
+        });
+    }
+
+    // Bisa dipanggil dari tombol lain di website
+    window.cyberAlert = cyberAlert;
+    window.cyberBoot = cyberBoot;
+    window.cyberLogin = cyberLogin;
+
+})();
+
+  
+/* =====================================
+   21. BACKGROUND MUSIC JEKPRA W
+===================================== */
+
+(() => {
+    const music = document.getElementById("backgroundMusic");
+    const musicButton = document.getElementById("musicButton");
+    const loginForm = document.getElementById("loginForm");
+    const loginInput = document.getElementById("loginName");
+    const app = document.getElementById("app");
+
+    if (!music || !musicButton || !loginForm || !app) {
+        return;
+    }
+
+    // Volume musik: 0.0 sampai 1.0
+    music.volume = 0.25;
+
+    let musicEnabled = true;
+
+    function updateMusicButton() {
+        musicButton.textContent =
+            musicEnabled && !music.paused ? "🔊" : "🔇";
+
+        musicButton.setAttribute(
+            "aria-pressed",
+            String(musicEnabled && !music.paused)
+        );
+
+        musicButton.setAttribute(
+            "aria-label",
+            musicEnabled ? "Matikan musik" : "Nyalakan musik"
+        );
+
+        musicButton.title =
+            musicEnabled ? "Background Music: ON" :
+            "Background Music: OFF";
+    }
+
+    async function playBackgroundMusic() {
+        if (!musicEnabled) return;
+
+        try {
+            await music.play();
+        } catch (error) {
+            console.log(
+                "Musik belum bisa diputar. Periksa file MP3.",
+                error
+            );
+        }
+
+        updateMusicButton();
+    }
+
+    // Mulai musik hanya jika login berhasil.
+    loginForm.addEventListener("submit", function () {
+        const enteredName = loginInput.value.trim();
+
+        if (
+            enteredName.toLowerCase() ===
+            ALLOWED_NAME.toLowerCase()
+        ) {
+            playBackgroundMusic();
+        }
+    });
+
+    // Tombol musik ON/OFF.
+    musicButton.addEventListener("click", async function () {
+        musicEnabled = !musicEnabled;
+
+        if (musicEnabled) {
+            await playBackgroundMusic();
+        } else {
+            music.pause();
+            updateMusicButton();
+        }
+    });
+
+    // Perbarui ikon jika audio selesai atau mengalami perubahan.
+    music.addEventListener("play", updateMusicButton);
+    music.addEventListener("pause", updateMusicButton);
+    music.addEventListener("error", function () {
+        updateMusicButton();
+        console.log("File musik tidak ditemukan atau gagal dimuat.");
+    });
+
+    updateMusicButton();
+})();
+
+</script>
+</body>
+</html>
